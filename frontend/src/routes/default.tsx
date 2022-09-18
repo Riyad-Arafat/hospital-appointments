@@ -1,7 +1,7 @@
 import { RouteProps } from "react-router-dom";
 
-import GuestLayout from "./guards/GuestLayout";
-import AuthedLayout from "./guards/AuthedLayout";
+import GuestLayout from "routes/guards/GuestLayout";
+import AuthedLayout from "routes/guards/AuthedLayout";
 
 export const DefaultRoutes: RouteProps[] = [
   {

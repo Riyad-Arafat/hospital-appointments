@@ -1,12 +1,12 @@
-import { http } from "@utils/http";
+import { http } from "utils/http";
 import { AxiosResponse } from "axios";
 import {
   LoginProps,
   LoginResponse,
   RegisterProps,
   RegisterResponse,
-} from "src/types/Auth.type";
-import { UserType } from "src/types/User.type";
+} from "types/Auth.type";
+import { UserType } from "types/User.type";
 
 export const getCurrentUserAPI = async (): Promise<AxiosResponse<UserType>> => {
   return await http().get(`/me`);

@@ -1,5 +1,5 @@
-import { HandleTitle } from "@components/HandleTitle";
-import { LoadingSpin } from "@components/LoadingSpin";
+import { HandleTitle } from "components/HandleTitle";
+import { LoadingSpin } from "components/LoadingSpin";
 import React, { PropsWithChildren, Suspense } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 

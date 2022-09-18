@@ -3,11 +3,9 @@ import DefaultRoutes from "./default";
 import PortalRoutes from "./portal";
 import React from "react";
 
-const PortalLayout = React.lazy(
-  () => import("@components/Layout/PortalLayout")
-);
+const PortalLayout = React.lazy(() => import("components/Layout/PortalLayout"));
 const DefaultLayout = React.lazy(
-  () => import("@components/Layout/DefaultLayout")
+  () => import("components/Layout/DefaultLayout")
 );
 
 const Routing = () => {

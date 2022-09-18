@@ -1,5 +1,5 @@
 import { RouteProps } from "react-router-dom";
-import AuthedLayout from "@routes/guards/AuthedLayout";
+import AuthedLayout from "routes/guards/AuthedLayout";
 
 export const PortalRoutes: RouteProps[] = [
   {

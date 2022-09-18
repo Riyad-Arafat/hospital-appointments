@@ -1,12 +1,12 @@
-import { http } from "@utils/http";
+import { http } from "utils/http";
 import { AxiosResponse } from "axios";
-import { GetAppointmentsResponse } from "src/types/Appoinment.type";
+import { GetAppointmentsResponse } from "types/Appoinment.type";
 import {
   AllUsersResponse,
   Role,
   UpdateUserRequest,
   UserType,
-} from "src/types/User.type";
+} from "types/User.type";
 
 export const getUserAppointmentsApi = async (
   userId: string

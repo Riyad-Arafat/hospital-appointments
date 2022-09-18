@@ -1,6 +1,6 @@
-import { http } from "@utils/http";
+import { http } from "utils/http";
 import { AxiosResponse } from "axios";
-import { AppointmentRequest, AppointmenType } from "src/types/Appoinment.type";
+import { AppointmentRequest, AppointmenType } from "types/Appoinment.type";
 
 // function to create appointment and return status
 export const createAppointmentAPI = async (

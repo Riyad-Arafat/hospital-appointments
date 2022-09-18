@@ -1,7 +1,7 @@
 import React, { memo, PropsWithChildren, Suspense } from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { HandleTitle } from "@components/HandleTitle";
-import { LoadingSpin } from "@components/LoadingSpin";
+import { HandleTitle } from "components/HandleTitle";
+import { LoadingSpin } from "components/LoadingSpin";
 // Add a description to the interface
 
 interface Props {

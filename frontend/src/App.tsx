@@ -1,10 +1,8 @@
 import { BrowserRouter } from "react-router-dom";
-import Routing from "@routes/index";
+import Routing from "routes";
 
 /* Styles */
 import "antd/dist/antd.less";
-import "@fontsource/roboto";
-import "@style/App.scss";
 
 const App: React.FC = () => {
   return (
