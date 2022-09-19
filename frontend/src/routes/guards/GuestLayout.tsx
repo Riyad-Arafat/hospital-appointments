@@ -1,5 +1,6 @@
 import { HandleTitle } from "components/HandleTitle";
 import { LoadingSpin } from "components/LoadingSpin";
+import useAuth from "hooks/useAuth";
 import React, { PropsWithChildren, Suspense } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 
@@ -11,7 +12,7 @@ const GuestLayout: React.FC<PropsWithChildren<Props>> = ({
   children,
   authedOk = false,
 }): JSX.Element => {
-  let isAuthenticated = true;
+  const { isAuthenticated } = useAuth();
   if (isAuthenticated) {
     if (!authedOk) return <Navigate to={"/"} replace />;
   }
