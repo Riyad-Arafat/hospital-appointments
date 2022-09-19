@@ -1,6 +1,6 @@
 import Axios, { AxiosInstance, AxiosRequestHeaders } from "axios";
 
-const API_URL = "https://api.example.com";
+const API_URL = `${process.env.REACT_APP_API_URL}/api`;
 
 export const http = (): AxiosInstance => {
   const token = localStorage.getItem("token");

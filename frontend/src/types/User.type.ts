@@ -1,3 +1,6 @@
+import { AppointmenType } from "./Appoinment.type";
+import { SpecialityType } from "./Speciality.types";
+
 export type Role = "super_admin" | "doctor" | "client";
 
 export interface UserType {
@@ -6,6 +9,9 @@ export interface UserType {
   last_name: string;
   email: string;
   role: Role;
+  speciality?: SpecialityType;
+  appointments?: AppointmenType[];
+  arraival_time?: number;
 }
 
 export interface UpdateUserRequest {
@@ -13,8 +19,13 @@ export interface UpdateUserRequest {
   last_name: string;
   email: string;
   role: Role;
+  arraival_time: number;
 }
 
-export interface AllUsersResponse {
-  data: UserType[];
+export interface UpdateUserResponse {
+  user: UserType;
 }
+
+export type AllUsersResponse = {
+  data: UserType[];
+};

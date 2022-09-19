@@ -1,14 +1,17 @@
+import AuthContextProvider from "contexts/AuthContext";
 import { BrowserRouter } from "react-router-dom";
 import Routing from "routes";
 
 /* Styles */
-import "antd/dist/antd.less";
+import "./App.css";
 
 const App: React.FC = () => {
   return (
-    <BrowserRouter>
-      <Routing />
-    </BrowserRouter>
+    <AuthContextProvider>
+      <BrowserRouter>
+        <Routing />
+      </BrowserRouter>
+    </AuthContextProvider>
   );
 };
 

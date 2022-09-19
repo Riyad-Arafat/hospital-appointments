@@ -18,6 +18,4 @@ export interface AppointmentRequest {
   date: string;
 }
 
-export interface GetAppointmentsResponse {
-  data: AppointmenType[];
-}
+export type GetAppointmentsResponse = AppointmenType[];
