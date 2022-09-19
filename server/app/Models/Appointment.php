@@ -9,6 +9,16 @@ class Appointment extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        "id",
+        "client_id",
+        "doctor_id",
+        "date",
+        "time",
+        "name",
+        "description",
+    ];
+
     // Belongs to Doctor
     public function doctor()
     {

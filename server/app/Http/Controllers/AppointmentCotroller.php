@@ -6,6 +6,7 @@ use App\Http\Resources\AppointmentCollection;
 use App\Http\Resources\AppointmentResource;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class AppointmentCotroller extends Controller
 {
@@ -27,18 +28,39 @@ class AppointmentCotroller extends Controller
      */
     public function store(Request $request)
     {
-        // throw an error if the appointment is not between 12pm and 9pm
-        if ($request->start_date->format('H') < 12 || $request->start_date->format('H') > 21) {
-            throw new \Exception("Appointments can only be made between 12pm and 9pm");
-        }
-        // throe an error if the appointment doctor_id is the same as the client_id
-        if ($request->doctor_id == $request->client_id) {
-            throw new \Exception("You can't make an appointment with yourself");
-        }
+        try {
+            $request->validate([
+                "name" => "required|string",
+                "description" => "required|string",
+                "date" => "required|string",
+                "doctor_id" => "required",
+                "client_id" => "required",
+            ]);
+            // throw an error if the appointment is not between 12pm and 9pm
+            if ($request->date->format('H') < 12 || $request->date->format('H') > 21) {
+                throw new \Exception("Appointments can only be made between 12pm and 9pm");
+            }
+            // throe an error if the appointment doctor_id is the same as the client_id
+            if ($request->doctor_id == $request->client_id) {
+                throw new \Exception("You can't make an appointment with yourself");
+            }
 
-        // create the appointment
-        $appointment = Appointment::create($request->all());
-        return $appointment;
+            // create the appointment
+
+            $appointment = new Appointment([
+                "name" => $request->name,
+                "description" => $request->description,
+                "date" => $request->date,
+                "doctor_id" => $request->doctor_id,
+                "client_id" => $request->client_id,
+            ]);
+            $appointment->save();
+            return new AppointmentResource($appointment);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "message" => $th->getMessage(),
+            ], 400);
+        }
     }
 
     /**
