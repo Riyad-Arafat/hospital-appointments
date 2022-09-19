@@ -22,8 +22,8 @@ class AppointmentFactory extends Factory
             "description" => fake()->paragraph(),
             "start_date" => fake()->dateTime("now"),
             "end_date" => fake()->dateTime("+30 minutes"),
-            "client_id" => fake()->numberBetween(1, 10),
-            "doctor_id" => fake()->numberBetween(1, 10),
+            "client_id" => 1,
+            "doctor_id" => 2,
 
         ];
     }

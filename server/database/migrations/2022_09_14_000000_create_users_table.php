@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Department;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->string('uuid')->unique();
             $table->string('first_name');
             $table->string('last_name');
             $table->enum('role', ['super_admin', 'doctor', 'client'])->default("client");
@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
-            $table->foreignId("department_id")->constrained('departments')->onDelete("cascade")->onUpdate("cascade");
+            $table->foreignId("speciality_id")->constrained('specialities')->onDelete("cascade")->onUpdate("cascade");
         });
     }
 

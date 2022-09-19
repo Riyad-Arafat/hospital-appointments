@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\UserResource;
 use App\Http\Resources\UserResourceCollection;
-use App\Models\Department;
+use App\Models\Speciality;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,7 +19,6 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-
         $role = $request->query('role');
         error_log($role);
         if (!$role) {
@@ -42,28 +41,34 @@ class UserController extends Controller
                 'last_name' => 'required|string',
                 'email' => 'required|string|email|unique:users',
                 'password' => 'required|string',
-                'role' => 'required|string',
-                'department_id' => 'required|string',
+                'role' => 'string',
+                'speciality_id' => 'string',
             ]);
 
-            $department = Department::find($request->department_id);
-            if (!$department) {
-                return response()->json([
-                    'message' => 'department_id is not valid'
-                ], 404);
-            }
-            User::create([
+            // check if the role exists and is doctor
+
+            $user = new User([
                 'first_name' => $request->first_name,
                 'last_name' => $request->last_name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
-                'role' => $request->role,
-                'department_id' => $department->id,
             ]);
+            if ($request->role && $request->role == "doctor") {
+                $speciality = Speciality::find($request->speciality_id);
+                if (!$speciality) {
+                    return response()->json([
+                        'message' => 'speciality_id is not valid'
+                    ], 404);
+                }
+                $user->role = "doctor";
+                $user->speciality_id = $request->speciality_id;
+            } else {
+                $user->role = "client";
+            }
+
+            $user->save();
 
 
-
-            // $user->save();
 
             return response()->json([
                 'message' => 'Successfully created user!'
@@ -101,7 +106,8 @@ class UserController extends Controller
         if ($request->user->id == $user->id || $request->user->role == 'super_admin') {
             $user->update($request->all());
             return response()->json([
-                'message' => 'User updated successfully.'
+                'message' => 'Successfully updated user!',
+                'user' => $user
             ], 200);
         } else {
             return response()->json([

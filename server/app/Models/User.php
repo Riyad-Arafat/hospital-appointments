@@ -23,7 +23,7 @@ class User extends Authenticatable
         'last_name',
         'email',
         'password',
-        'department_id',
+        'speciality_id',
     ];
 
     /**
@@ -33,19 +33,22 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
+        "remember_token",
     ];
 
 
     // has many Appointments
     public function appointments()
     {
-        return $this->hasMany(Appointment::class);
+        $client = $this->hasMany(Appointment::class, "client_id");
+        $doctor = $this->hasMany(Appointment::class, "doctor_id");
+        return $client->union($doctor);
     }
 
-    // Belongs to Department
-    public function department()
+    // Belongs to Speciality
+    public function speciality()
     {
-        return $this->belongsTo(Department::class);
+        return $this->belongsTo(Speciality::class);
     }
 
     public function generateToken()
