@@ -17,34 +17,18 @@ class Role
     public function handle(Request $request, Closure $next, String $role)
     {
 
-        if ($role === "super_admin" && $request->user()->role === "super_admin") {
+
+        if ($request->user()->role === "super_admin") {
             return $next($request);
-        }
-
-        if ($role == "doctor") {
-            if ($request->user()->role == "doctor") {
-                return $next($request);
-            }
+        } elseif ($request->user()->role === $role) {
+            return $next($request);
+        } elseif ($request->user()->role === "client" && $role === "client_only") {
+            return $next($request);
+        } elseif ($request->user()->role === "doctor" && $role === "client") {
+            return $next($request);
+        } else {
             return response()->json([
-                'message' => 'Unauthorized.'
-            ], 401);
-        }
-
-        if ($role == "client_only") {
-            if ($request->user()->role == "client") {
-                return $next($request);
-            }
-            return response()->json([
-                'message' => 'Unauthorized.'
-            ], 401);
-        }
-
-        if ($role == "client") {
-            if ($request->user()->role == "client" || $request->user()->role == "doctor") {
-                return $next($request);
-            }
-            return response()->json([
-                'message' => 'Unauthorized.'
+                'message' => 'You are not authorized to access this route'
             ], 401);
         }
     }
