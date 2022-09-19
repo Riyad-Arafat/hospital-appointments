@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\UserResource;
-use App\Http\Resources\UserResourceCollection;
+use App\Http\Resources\UserCollection;
 use App\Models\Speciality;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -20,11 +20,16 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $role = $request->query('role');
-        error_log($role);
-        if (!$role) {
-            return new UserResourceCollection(User::all());
+        $speciality_id = $request->query('speciality_id');
+        if ($role && $speciality_id) {
+            return new UserCollection(User::where('role', $role)->where('speciality_id', $speciality_id)->get());
+        } else if ($role) {
+            return new UserCollection(User::where('role', $role)->get());
+        } else if ($speciality_id) {
+            return new UserCollection(User::where('speciality_id', $speciality_id)->get());
+        } else {
+            return new UserCollection(User::all());
         }
-        return new UserResourceCollection(User::all()->where('role', $role));
     }
 
     /**
@@ -41,42 +46,27 @@ class UserController extends Controller
                 'last_name' => 'required|string',
                 'email' => 'required|string|email|unique:users',
                 'password' => 'required|string',
-                'role' => 'string',
-                'speciality_id' => 'string',
+                'role' => 'required|string',
+                "speciality_id" => "required|integer",
+                'arraival_time' => 'required|integer',
             ]);
-
-            // check if the role exists and is doctor
-
+            $time = date("Y-m-d H:i:s", $request->arraival_time);
             $user = new User([
                 'first_name' => $request->first_name,
                 'last_name' => $request->last_name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
+                'speciality_id' => $request->speciality_id,
+                'arraival_time' => $time,
+                "role" => $request->role,
             ]);
-            if ($request->role && $request->role == "doctor") {
-                $speciality = Speciality::find($request->speciality_id);
-                if (!$speciality) {
-                    return response()->json([
-                        'message' => 'speciality_id is not valid'
-                    ], 404);
-                }
-                $user->role = "doctor";
-                $user->speciality_id = $request->speciality_id;
-            } else {
-                $user->role = "client";
-            }
-
             $user->save();
-
-
-
             return response()->json([
                 'message' => 'Successfully created user!'
             ], 201);
         } catch (\Exception $e) {
-            error_log($e);
             return response()->json([
-                'message' => 'Failed to create user!'
+                'message' => $e->getMessage()
             ], 400);
         }
     }
@@ -100,19 +90,59 @@ class UserController extends Controller
      * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request,  $id)
     {
         // check if the user is an super admin or the user is updating his profile
-        if ($request->user->id == $user->id || $request->user->role == 'super_admin') {
-            $user->update($request->all());
+        try {
+            $user = User::find($id);
+
+            if ($request->user()->id == $id || $request->user()->role == 'super_admin') {
+
+                $request->validate([
+                    'first_name' => 'required|string',
+                    'last_name' => 'required|string',
+                    'email' => 'required|string||email',
+                    'arraival_time' => 'integer',
+                    'role' => 'string',
+                    'speciality_id' => 'integer',
+                ]);
+
+                $user->update($request->only(['first_name', 'last_name', 'email']));
+                $time = date("Y-m-d H:i:s", $request->arraival_time);
+                $user->arraival_time = $time;
+                $user->save();
+
+
+                /// check if the user is a (super admin)
+                if ($request->user()->role == 'super_admin') {
+                    // check if the role exists and is (doctor)
+                    if ($request->role && $request->role == "doctor") {
+                        // check if the speciality exists and is valid
+                        $speciality = Speciality::find($request->speciality_id);
+                        if (!$speciality) {
+                            return response()->json([
+                                'message' => 'speciality_id is not valid'
+                            ], 404);
+                        }
+                        $user->update([
+                            'role' => $request->role,
+                            'speciality_id' => $request->speciality_id,
+                        ]);
+                    }
+                }
+                return response()->json([
+                    'message' => 'Successfully updated user!',
+                    'user' => new UserResource($user)
+                ], 200);
+            } else {
+                return response()->json([
+                    'message' => 'You are not authorized to update this user.'
+                ], 403);
+            }
+        } catch (\Throwable $th) {
             return response()->json([
-                'message' => 'Successfully updated user!',
-                'user' => $user
-            ], 200);
-        } else {
-            return response()->json([
-                'message' => 'You are not authorized to update this user.'
-            ], 403);
+                'message' => $th->getMessage()
+            ], 400);
         }
     }
 
@@ -130,6 +160,34 @@ class UserController extends Controller
             'message' => 'User deleted successfully.'
         ], 200);
     }
+
+
+    // register a new user
+    public function register(Request $request)
+    {
+        try {
+            $request->validate([
+                'first_name' => 'required|string',
+                'last_name' => 'required|string',
+                'email' => 'required|string|email|unique:users',
+                'password' => 'required|string',
+            ]);
+
+            $user = new User([
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                "role" => "client"
+            ]);
+            $user->save();
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 400);
+        }
+    }
+
 
     // login user
     public function login(Request $request)
@@ -170,7 +228,6 @@ class UserController extends Controller
     {
 
         try {
-            error_log($request->user());
             //code...
             $request->user()->revokeToken();
 
