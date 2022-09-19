@@ -18,7 +18,7 @@ class SpecialityFactory extends Factory
     {
         return [
             //
-            'title' => fake()->name(),
+            'name' => fake()->name(),
             'description' => fake()->paragraph(),
         ];
     }

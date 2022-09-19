@@ -1,13 +1,12 @@
 <?php
 
 use App\Http\Controllers\AppointmentCotroller;
+use App\Http\Controllers\SpecialityController;
 use App\Http\Controllers\UserController;
+use App\Http\Resources\UserResource;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,7 +26,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     // get authed user  
     Route::get('/me', function () {
-        return auth()->user();
+        $user = User::find(Auth::id());
+        return new UserResource($user);
     });
 
     // authed user routes
@@ -45,6 +45,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::resource('appointments', AppointmentCotroller::class)->only(["store", "update", "destroy"])->middleware('role:client_only');
     Route::resource('appointments', AppointmentCotroller::class)->only(["index", "show"]);
 
+    // specialities Endpoints
+    Route::apiResource('specialities', SpecialityController::class)->middleware('role:super_admin');
+    Route::resource('specialities', SpecialityController::class)->only(["index", "show"]);
+
     // logout the user
     Route::post('logout', UserController::class . '@logout');
 });
@@ -53,7 +57,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 // login not required
 Route::group(['middleware' => ['guest:sanctum']], function () {
     // Register a new user
-    Route::resource('register', UserController::class)->only(["store"]);
+    Route::post('register', UserController::class . '@register');
     // get all clients
     Route::post('login', UserController::class . '@login');
 });

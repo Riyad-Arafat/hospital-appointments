@@ -18,13 +18,11 @@ class AppointmentFactory extends Factory
     {
         return [
             //
-            "title" => fake()->sentence(),
+            "name" => fake()->sentence(),
             "description" => fake()->paragraph(),
-            "start_date" => fake()->dateTime("now"),
-            "end_date" => fake()->dateTime("+30 minutes"),
+            "date" => fake()->dateTime("now"),
             "client_id" => 1,
             "doctor_id" => 2,
-
         ];
     }
 }
