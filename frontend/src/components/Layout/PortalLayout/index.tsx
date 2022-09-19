@@ -2,7 +2,7 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import { Layout } from "antd";
 
-const Header = React.lazy(() => import("./Header"));
+const Header = React.lazy(() => import("../Header"));
 
 export const PortalLayout: React.FC<React.PropsWithChildren<unknown>> = ({
   children,
