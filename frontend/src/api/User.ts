@@ -1,18 +1,13 @@
 import { http } from "utils/http";
 import { AxiosResponse } from "axios";
 import { GetAppointmentsResponse } from "types/Appoinment.type";
-import {
-  AllUsersResponse,
-  Role,
-  UpdateUserRequest,
-  UserType,
-} from "types/User.type";
+import { AllUsersResponse, UpdateUserRequest, UserType } from "types/User.type";
+import { QueryProps } from "types/Common.type";
 
-export const getUserAppointmentsApi = async (
-  userId: string
-): Promise<AxiosResponse<GetAppointmentsResponse>> => {
-  const { data } = await http().get(`/users/${userId}/appointments`);
-  return data;
+export const getCurrentUserAppointments = async (): Promise<
+  AxiosResponse<GetAppointmentsResponse>
+> => {
+  return await http().get(`/me/appointments`);
 };
 
 // function to create user by email and password and return token and type of token
@@ -44,12 +39,8 @@ export const deleteUserByIdAPI = async (
   return await http().delete(`/users/${userId}`);
 };
 
-// function to get all users
-interface Query {
-  role: Role;
-}
 export const getAllUsersApi = async (
-  query?: Query
+  query?: QueryProps
 ): Promise<AxiosResponse<AllUsersResponse>> => {
   return await http().get("/users", { params: query });
 };

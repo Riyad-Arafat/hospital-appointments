@@ -1,39 +1,49 @@
 import { useCallback, useContext, useMemo } from "react";
-import { loginAPI, logoutAPI } from "src/api/Auth";
-import { AuthContext } from "src/contexts/AuthContext";
-import { LoginProps } from "src/types/Auth.type";
+import { loginAPI, logoutAPI } from "api/Auth";
+import { AuthContext } from "contexts/AuthContext";
+import { LoginProps } from "types/Auth.type";
 
 const useAuth = () => {
-  const { user, loading } = useContext(AuthContext);
+  const { user, loading, isAuthenticated, reAuth } = useContext(AuthContext);
 
-  const login = useCallback(async (values: LoginProps) => {
-    try {
-      const { data, status } = await loginAPI(values);
-      status === 200 && localStorage.setItem("token", data.token);
-      return data;
-    } catch (error) {
-      return "Please check your email and password";
-    }
-  }, []);
+  const login = useCallback(
+    async (values: LoginProps) => {
+      try {
+        const { data, status } = await loginAPI(values);
+        status === 200 && localStorage.setItem("token", data.token);
+        await reAuth();
+        return data;
+      } catch (error) {
+        throw Error("Please check your email and password");
+      }
+    },
+    [reAuth]
+  );
 
   const logout = useCallback(async () => {
     try {
       const { status } = await logoutAPI();
       status === 200 && localStorage.removeItem("token");
+      await reAuth();
       return "Logout successfully";
     } catch (error) {
       return "Something went wrong";
     }
-  }, []);
+  }, [reAuth]);
 
-  return useMemo(() => {
-    return {
-      user,
-      loading,
-      login,
-      logout,
-    };
-  }, [user, loading, login, logout]);
+  return {
+    login,
+    logout,
+    reAuth,
+    ...useMemo(
+      () => ({
+        user,
+        loading,
+        isAuthenticated,
+      }),
+      [user, loading, isAuthenticated]
+    ),
+  };
 };
 
 export default useAuth;

@@ -8,7 +8,9 @@ import {
 } from "types/Auth.type";
 import { UserType } from "types/User.type";
 
-export const getCurrentUserAPI = async (): Promise<AxiosResponse<UserType>> => {
+export const getCurrentUserAPI = async (): Promise<
+  AxiosResponse<{ data: UserType }>
+> => {
   return await http().get(`/me`);
 };
 
