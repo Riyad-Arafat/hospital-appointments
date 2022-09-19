@@ -9,8 +9,16 @@ class Speciality extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        "id",
+        'name',
+        'description',
+    ];
+
+
+
     // has many Users
-    public function users()
+    public function doctors()
     {
         return $this->hasMany(User::class);
     }
