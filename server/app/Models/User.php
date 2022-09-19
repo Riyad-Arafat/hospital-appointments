@@ -24,6 +24,8 @@ class User extends Authenticatable
         'email',
         'password',
         'speciality_id',
+        "arraival_time",
+        "role",
     ];
 
     /**
@@ -61,7 +63,7 @@ class User extends Authenticatable
             $this->save();
             return $this->remember_token;
         } catch (\Exception $e) {
-            error_log($e);
+            error_log($e->getMessage());
             return response()->json([
                 'message' => 'Error while generating token',
                 'error' => $e->getMessage()
@@ -76,7 +78,7 @@ class User extends Authenticatable
         try {
             $this->tokens()->delete();
         } catch (\Exception $e) {
-            error_log($e);
+            error_log($e->getMessage());
             return response()->json([
                 'message' => 'Error while revoking token',
                 'error' => $e->getMessage()
