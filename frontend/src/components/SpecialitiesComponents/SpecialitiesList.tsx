@@ -64,9 +64,6 @@ const ListItem = React.memo(
         </div>
       </List.Item>
     );
-  },
-  (prevProps, nextProps) => {
-    return prevProps.data.id === nextProps.data.id;
   }
 );
 
