@@ -1,13 +1,16 @@
 import { Select, Space } from "antd";
 import UsersList from "components/UserComponets/UsersList";
+import useAuth from "hooks/useAuth";
 import { useDispatch } from "hooks/useDispatch";
 import React, { useCallback, useEffect, useMemo } from "react";
 import { ActionTypes } from "types/Atcions.typs";
 import { QueryProps } from "types/Common.type";
 import { GetAllSpecialitiesResponse } from "types/Speciality.types";
 import { AllUsersResponse } from "types/User.type";
+import AppointmentForm from "./AppointmentForm";
 
 const HomePage = () => {
+  const { user } = useAuth();
   const [query, setQuery] = React.useState<QueryProps>();
   const changeQuery = (value: number) => {
     console.log(value);
@@ -44,6 +47,9 @@ const HomePage = () => {
         size="large"
       >
         <Filter onSearch={changeQuery} />
+        {user?.role !== "doctor" ? (
+          <AppointmentForm reFetch={getAllUsers} />
+        ) : null}
       </Space>
       <br />
       <UsersList data={data} />

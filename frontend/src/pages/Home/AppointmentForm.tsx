@@ -1,151 +1,267 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Button,
   Form,
-  FormInstance,
   Input,
   Modal,
   DatePicker,
-  Select,
   Space,
+  Select,
+  Alert,
 } from "antd";
 import type { RangePickerProps } from "antd/es/date-picker";
 import moment from "moment";
-const { Option } = Select;
+import { FormProps } from "types/Common.type";
+import { AppointmentRequest, AppointmenType } from "types/Appoinment.type";
+import useDispatch from "hooks/useDispatch";
+import { GetAllSpecialitiesResponse } from "types/Speciality.types";
+import { ActionTypes } from "types/Atcions.typs";
+import useAuth from "hooks/useAuth";
 
 const disabledDate: RangePickerProps["disabledDate"] = (current) => {
-  // Can not select days before today and today
+  // Can not select days before before today
   return current && current < moment().endOf("day");
 };
+// function to get range between two numbers
+const range = (start: number, end: number) => {
+  const result: number[] = [];
+  for (let i = start; i < end; i++) {
+    result.push(i);
+  }
+  return result;
+};
 
-export const AppointmentForm = ({ id }: { id: string }) => {
+export const AppointmentForm = ({
+  data,
+  reFetch,
+}: {
+  data?: AppointmenType;
+  reFetch?: () => void;
+}) => {
   const [open, setOpen] = useState(false);
-  const [confirmLoading, setConfirmLoading] = useState(false);
-  const [form] = Form.useForm();
 
   const showModal = () => {
     setOpen(true);
   };
 
-  const handleOk = () => {
-    setConfirmLoading(true);
-    form
-      .validateFields()
-      .then((values) => {
-        let date: moment.Moment = values["date"];
-        let d = date.toDate();
-        d.setHours(values["time"], 0, 0);
-        values["date"] = d;
-        console.log({ values });
-
-        // form.resetFields();
-        // setOpen(false);
-        console.log("Received values of form: ", values);
-      })
-      .catch((info) => {
-        console.log("Validate Failed:", info);
-      });
-
-    setTimeout(() => {
-      setConfirmLoading(false);
-    }, 2000);
-  };
-
   const handleCancel = () => {
-    console.log("Clicked cancel button");
     setOpen(false);
   };
 
+  const onSucces = () => {
+    setOpen(false);
+    reFetch?.();
+  };
   return (
     <>
       <Button type="primary" onClick={showModal}>
-        Book
+        {!!data ? "Edit" : "Add"} Appointment
       </Button>
       <Modal
         title="Title"
         open={open}
-        onOk={handleOk}
-        confirmLoading={confirmLoading}
         onCancel={handleCancel}
+        footer={null}
+        destroyOnClose
       >
-        <CreateAppointment form={form} />
+        <CreateAppointment
+          onCancel={handleCancel}
+          onSuccess={onSucces}
+          initialValues={data}
+        />
       </Modal>
     </>
   );
 };
 
-const CreateAppointment = ({ form }: { form: FormInstance }) => {
-  const [timeOptions, settimeOptions] = useState<React.ReactNode[]>();
+const CreateAppointment = ({
+  onCancel,
+  onSuccess,
+  initialValues,
+}: FormProps<AppointmenType>) => {
+  const { user } = useAuth();
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const { dispatch: sDispathch, data: specialries } =
+    useDispatch<GetAllSpecialitiesResponse>();
+  const { dispatch, error } = useDispatch();
+  const [form] = Form.useForm();
 
-  const setOptii = () => {
-    const options: React.ReactNode[] = [];
-    for (let i = 0; i <= 9; i++) {
-      options.push(
-        <Option key={`${i + 12}`}>{`${i === 0 ? 12 : i}pm`}</Option>
-      );
+  const submit = async (values: any) => {
+    let date = values.date as moment.Moment;
+    date.seconds(0);
+    date.minutes(0);
+    if (!!user?.id) {
+      setConfirmLoading(true);
+      let data: AppointmentRequest = {
+        name: values.name,
+        description: values.description,
+        date: date.format("YYYY-MM-DD HH:mm:ss"),
+        client_id: user?.id,
+        speciality_id: values.speciality_id,
+      };
+      if (!!initialValues?.id) await updateFun(data);
+      else await createFun(data);
     }
-    settimeOptions(options);
+  };
+
+  const updateFun = async (values: AppointmentRequest) => {
+    if (!!user?.id && !!initialValues?.id) {
+      await dispatch({
+        type: ActionTypes.UPDATE_APPOINTMENT,
+        payload: { appointmentId: initialValues.id, data: values },
+      })
+        .then(() => {
+          onSuccess?.();
+          form.resetFields();
+        })
+        .finally(() => {
+          setConfirmLoading(false);
+        });
+    }
+  };
+
+  const createFun = async (values: AppointmentRequest) => {
+    if (!!user?.id) {
+      await dispatch({
+        type: ActionTypes.CREATE_APPOINTMENT,
+        payload: { data: values },
+      })
+        .then(() => {
+          onSuccess?.();
+          form.resetFields();
+        })
+        .finally(() => {
+          setConfirmLoading(false);
+        });
+    }
   };
 
   useEffect(() => {
-    setOptii();
+    sDispathch({
+      type: ActionTypes.GET_ALL_SPECIALTIES,
+      payload: {},
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const Options = useMemo(() => {
+    return specialries?.data.map((item) => (
+      <Select.Option key={item.id} value={item.id}>
+        {item.name}
+      </Select.Option>
+    ));
+  }, [specialries]);
+
   return (
-    <Form form={form} layout="vertical" name="form_in_modal">
-      <Form.Item
-        name="title"
-        label="Title"
-        rules={[
-          { required: true, message: "Please input the title of Appointment!" },
-        ]}
+    <>
+      {!!error && <Alert message={error?.message} type="error" />}
+      <br />
+
+      <Form<AppointmentRequest>
+        form={form}
+        layout="vertical"
+        onFinish={submit}
+        initialValues={{
+          ...initialValues,
+
+          date: moment(initialValues?.date),
+          speciality_id: initialValues?.speciality.id,
+        }}
       >
-        <Input />
-      </Form.Item>
-      <Form.Item
-        name="description"
-        label="Description"
-        rules={[
-          {
-            required: true,
-            message: "Please input the description of Appointment!",
-          },
-        ]}
-      >
-        <Input />
-      </Form.Item>
-      <Space>
         <Form.Item
-          name="date"
-          label="Date"
+          name="name"
+          label="Name"
           rules={[
             {
               required: true,
-              message: "Please input the Day of Appointment!",
+              message: "Please input the Name of Appointment!",
             },
           ]}
         >
-          <DatePicker disabledDate={disabledDate} size="large" />
+          <Input />
         </Form.Item>
-
         <Form.Item
-          name="time"
-          label="time"
+          name="description"
+          label="Description"
           rules={[
             {
               required: true,
-              message: "Please input the time of Appointment!",
+              message: "Please input the description of Appointment!",
             },
           ]}
         >
-          <Select size="large" style={{ width: 200 }}>
-            {timeOptions}
-          </Select>
+          <Input />
         </Form.Item>
-      </Space>
+        <Space align="end">
+          <Form.Item
+            name="date"
+            label="Date"
+            rules={[
+              {
+                required: true,
+                message: "Please input the Day of Appointment!",
+              },
+            ]}
+          >
+            <DatePicker
+              showTime
+              disabledDate={disabledDate}
+              showNow={false}
+              use12Hours
+              disabledTime={() => {
+                return {
+                  disabledHours: () => {
+                    return [...range(0, 12), 22, 23];
+                  },
+                  disabledMinutes: () => {
+                    return range(1, 60);
+                  },
+                  disabledSeconds: () => {
+                    return range(1, 60);
+                  },
+                };
+              }}
+              format="YYYY-MM-DD h A"
+              size="large"
+            />
+          </Form.Item>
 
-      {/*  */}
-    </Form>
+          <Form.Item
+            name="speciality_id"
+            label="Speciality"
+            rules={[
+              {
+                required: true,
+                type: "number",
+                message: "Select Speciality",
+              },
+            ]}
+          >
+            <Select size="large" placeholder="Select Speciality">
+              {Options}
+            </Select>
+          </Form.Item>
+        </Space>
+
+        <Space
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+          }}
+        >
+          <Button type="primary" htmlType="submit" loading={confirmLoading}>
+            Submit
+          </Button>
+          <Button
+            htmlType="button"
+            onClick={onCancel}
+            disabled={confirmLoading}
+          >
+            Cancel
+          </Button>
+        </Space>
+      </Form>
+    </>
   );
 };
 

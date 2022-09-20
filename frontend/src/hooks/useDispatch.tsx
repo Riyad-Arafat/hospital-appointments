@@ -59,13 +59,13 @@ type Action =
   | { type: ActionTypes.GET_CURRENT_USER_APPPOINTMENTS; payload?: never }
   | {
       type: ActionTypes.CREATE_APPOINTMENT | ActionTypes.UPDATE_APPOINTMENT;
-      payload: AppointmentRequest;
+      payload: { data: AppointmentRequest; appointmentId?: string | number };
     }
   | {
       type:
         | ActionTypes.GET_USER_APPOINTMENTS_BY_ID
         | ActionTypes.DELETE_APPOINTMENT;
-      payload: { appointmenId: string };
+      payload: { appointmenId: string | number };
     }
   // /////////////// Speciality action ///////////////////////////////////////////////
   | { type: ActionTypes.CREATE_SPECIALTY; payload: SpecialityRequest }
@@ -148,13 +148,16 @@ export function useDispatch<T = DataType>() {
             );
             break;
           case ActionTypes.CREATE_APPOINTMENT:
-            await createAppointmentAPI(props.payload).then((res) => {
+            await createAppointmentAPI(props.payload.data).then((res) => {
               data = res.data as T;
               setData(data);
             });
             break;
           case ActionTypes.UPDATE_APPOINTMENT:
-            await updateAppointmentAPI(props.payload).then((res) => {
+            await updateAppointmentAPI(
+              props.payload.appointmentId || "",
+              props.payload.data
+            ).then((res) => {
               data = res.data as T;
               setData(data);
             });

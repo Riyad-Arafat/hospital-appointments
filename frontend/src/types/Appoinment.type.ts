@@ -1,21 +1,22 @@
+import { SpecialityType } from "./Speciality.types";
+import { UserType } from "./User.type";
+
 export type TimeType = "hour" | "minute" | "hours" | "minutes";
 export interface AppointmenType {
   id: number;
-  title: string;
+  name: string;
   description: string;
-  doctor_id: string;
-  client_id: string;
-  time: `${number}-${TimeType}`;
+  speciality: SpecialityType;
+  client: UserType;
   date: string;
 }
 
 export interface AppointmentRequest {
-  title: string;
+  name: string;
   description: string;
-  doctor_id: string;
+  speciality_id: string;
   client_id: string;
-  time: `${number}-${TimeType}`;
   date: string;
 }
 
-export type GetAppointmentsResponse = AppointmenType[];
+export type GetAppointmentsResponse = { data: AppointmenType[] };

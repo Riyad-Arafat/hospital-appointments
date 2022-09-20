@@ -5,7 +5,7 @@ import { ActionTypes } from "types/Atcions.typs";
 import { UserType } from "types/User.type";
 import { Select } from "antd";
 import { GetAllSpecialitiesResponse } from "types/Speciality.types";
-import { getSameHour, hourToTimestamp } from "utils/utils";
+import { addAmPm } from "utils/utils";
 
 const { Option } = Select;
 
@@ -128,7 +128,6 @@ const UserFormComponet = ({
         initialValues={{
           ...initialValues,
           speciality_id: initialValues?.speciality?.id,
-          arraival_time: getSameHour(initialValues?.arraival_time || 0),
         }}
         onFinish={handleOk}
       >
@@ -214,8 +213,8 @@ const UserFormComponet = ({
             {Array(10)
               .fill(0)
               .map((_, i) => (
-                <Select.Option key={i} value={hourToTimestamp(i + 12)}>
-                  {i === 0 ? 12 : i}:00pm
+                <Select.Option key={i} value={12 + i}>
+                  {addAmPm(12 + i)}
                 </Select.Option>
               ))}
           </Select>

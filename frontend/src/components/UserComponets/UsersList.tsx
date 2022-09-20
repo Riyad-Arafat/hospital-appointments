@@ -7,7 +7,7 @@ import DeleteUser from "./DeleteUser";
 import UserForm from "./UserForm";
 import useAuth from "hooks/useAuth";
 import { useLocation } from "react-router-dom";
-import { timestampToHour } from "utils/utils";
+import { addAmPm } from "utils/utils";
 
 const UsersList = React.memo(
   ({
@@ -72,14 +72,11 @@ const ListItem = React.memo(
           <h1>
             Name: {data.first_name} {data.last_name}
           </h1>
-          <b>Arrival Time: {timestampToHour(data.arraival_time || 0)}</b>
+          <b>Arrival Time: {addAmPm(data.arraival_time || 0)}</b>
           <b>Speciality: {data.speciality?.name || "None"}</b>
         </div>
       </List.Item>
     );
-  },
-  (prevProps, nextProps) => {
-    return prevProps.data.id === nextProps.data.id;
   }
 );
 

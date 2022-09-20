@@ -11,21 +11,22 @@ export const createAppointmentAPI = async (
 
 // function to get a appointment by id and return appointment
 export const getAppointmentByIdAPI = async (
-  appointmentId: string
+  appointmentId: string | number
 ): Promise<AxiosResponse<AppointmenType>> => {
   return await http().get(`/appointments/${appointmentId}`);
 };
 
 // function to update appointment and return status
 export const updateAppointmentAPI = async (
+  appointmentId: string | number,
   data: AppointmentRequest
 ): Promise<AxiosResponse> => {
-  return await http().put("/appointments", { ...data });
+  return await http().put(`/appointments/${appointmentId}`, { ...data });
 };
 
 // function to delete appointment and return status
 export const deleteAppointmentAPI = async (
-  appointmentId: string
+  appointmentId: string | number
 ): Promise<AxiosResponse> => {
   return await http().delete(`/appointments/${appointmentId}`);
 };
