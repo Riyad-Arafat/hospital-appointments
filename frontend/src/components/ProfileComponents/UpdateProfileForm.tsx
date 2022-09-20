@@ -8,7 +8,7 @@ import { UpdateUserRequest, UpdateUserResponse } from "types/User.type";
 import useDispatch from "hooks/useDispatch";
 import { ActionTypes } from "types/Atcions.typs";
 import useAuth from "hooks/useAuth";
-import { getSameHour, hourToTimestamp } from "utils/utils";
+import { addAmPm } from "utils/utils";
 
 const { useForm } = Form;
 
@@ -47,7 +47,7 @@ const UpdateProfileForm = () => {
           first_name: profile?.first_name,
           last_name: profile?.last_name,
           email: profile?.email,
-          arraival_time: getSameHour(profile?.arraival_time || 0),
+          arraival_time: profile?.arraival_time || 0,
         }}
         onFinish={handelSubmit}
       >
@@ -115,8 +115,8 @@ const UpdateProfileForm = () => {
               {Array(10)
                 .fill(0)
                 .map((_, i) => (
-                  <Select.Option key={i} value={hourToTimestamp(i + 12)}>
-                    {i === 0 ? 12 : i}:00pm
+                  <Select.Option key={i} value={12 + i}>
+                    {addAmPm(12 + i)}
                   </Select.Option>
                 ))}
             </Select>
