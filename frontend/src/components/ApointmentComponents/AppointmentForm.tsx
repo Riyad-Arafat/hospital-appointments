@@ -19,8 +19,9 @@ import { ActionTypes } from "types/Atcions.typs";
 import useAuth from "hooks/useAuth";
 
 const disabledDate: RangePickerProps["disabledDate"] = (current) => {
-  // Can not select days before before today
-  return current && current < moment().endOf("day");
+  // Can not select days before current day
+  let past = moment().subtract(1, "minute");
+  return current && current < past;
 };
 // function to get range between two numbers
 const range = (start: number, end: number) => {
@@ -208,10 +209,11 @@ const CreateAppointment = ({
               disabledDate={disabledDate}
               showNow={false}
               use12Hours
-              disabledTime={() => {
+              disabledTime={(current) => {
+                let past = moment().subtract(1, "minute");
                 return {
                   disabledHours: () => {
-                    return [...range(0, 12), 22, 23];
+                    return [...range(12, past.hour()), ...range(0, 12), 22, 23];
                   },
                   disabledMinutes: () => {
                     return range(1, 60);

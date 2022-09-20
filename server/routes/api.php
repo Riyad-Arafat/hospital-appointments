@@ -38,7 +38,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
         // check if user is doctor return all appmintments for doctor speciality
         if (Auth::user()->role == 'doctor') {
-            return new AppointmentCollection(Appointment::where('speciality_id', Auth::user()->speciality_id)->get());
+            // return Appointment collection where date in current day and speciality_id is equal to the speciality_id from the authed user
+            return new AppointmentCollection(Appointment::where("speciality_id", Auth::user()->speciality_id)->whereDate("date", date("Y-m-d"))->get());
         } else {
             // return all appointments for user
             return new AppointmentCollection(auth()->user()->appointments);
