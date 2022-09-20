@@ -47,7 +47,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     });
 
     // users Endpoints
-    Route::resource('users', UserController::class)->only(["store", "destory"])->middleware('role:super_admin');
+    Route::resource('users', UserController::class)->only(["store", "destroy"])->middleware('role:super_admin');
     Route::resource('users', UserController::class)->only(["update"])->middleware('role:client');
     Route::resource('users', UserController::class)->only(["index", "show"]);
 
