@@ -18,9 +18,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description');
-            $table->dateTime('start_date');
-            $table->timestamp("time")->nullable();
-            $table->foreignId("doctor_id")->constrained("users")->onDelete("cascade")->onUpdate("cascade");
+            $table->dateTime('date');
+            $table->foreignId("speciality_id")->nullable()->constrained('specialities')->onDelete("cascade")->onUpdate("cascade");
             $table->foreignId("client_id")->constrained("users")->onDelete("cascade")->onUpdate("cascade");
             $table->timestamps();
         });

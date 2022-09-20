@@ -12,22 +12,21 @@ class Appointment extends Model
     protected $fillable = [
         "id",
         "client_id",
-        "doctor_id",
+        "speciality_id",
         "date",
         "time",
         "name",
         "description",
     ];
 
-    // Belongs to Doctor
-    public function doctor()
-    {
-        return $this->belongsTo(User::class, "doctor_id");
-    }
-
-    // Belongs to client
+    // Belongs to a client
     public function client()
     {
         return $this->belongsTo(User::class, "client_id");
+    }
+    // Belongs to a speciality
+    public function speciality()
+    {
+        return $this->belongsTo(Speciality::class, "speciality_id");
     }
 }

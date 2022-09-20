@@ -3,7 +3,10 @@
 use App\Http\Controllers\AppointmentCotroller;
 use App\Http\Controllers\SpecialityController;
 use App\Http\Controllers\UserController;
+use App\Http\Resources\AppointmentCollection;
+use App\Http\Resources\AppointmentResource;
 use App\Http\Resources\UserResource;
+use App\Models\Appointment;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -32,7 +35,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     // authed user routes
     Route::get('/me/appointments', function () {
-        return  auth()->user()->appointments;
+
+        // check if user is doctor return all appmintments for doctor speciality
+        if (Auth::user()->role == 'doctor') {
+            return new AppointmentCollection(Appointment::where('speciality_id', Auth::user()->speciality_id)->get());
+        } else {
+            // return all appointments for user
+            return new AppointmentCollection(auth()->user()->appointments);
+        }
     });
 
     // users Endpoints

@@ -42,9 +42,7 @@ class User extends Authenticatable
     // has many Appointments
     public function appointments()
     {
-        $client = $this->hasMany(Appointment::class, "client_id");
-        $doctor = $this->hasMany(Appointment::class, "doctor_id");
-        return $client->union($doctor);
+        return $this->hasMany(Appointment::class, "client_id");;
     }
 
     // Belongs to Speciality

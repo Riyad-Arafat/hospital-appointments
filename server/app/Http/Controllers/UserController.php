@@ -50,14 +50,13 @@ class UserController extends Controller
                 "speciality_id" => "required|integer",
                 'arraival_time' => 'required|integer',
             ]);
-            $time = date("Y-m-d H:i:s", $request->arraival_time);
             $user = new User([
                 'first_name' => $request->first_name,
                 'last_name' => $request->last_name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'speciality_id' => $request->speciality_id,
-                'arraival_time' => $time,
+                'arraival_time' => $request->arraival_time,
                 "role" => $request->role,
             ]);
             $user->save();
@@ -107,10 +106,7 @@ class UserController extends Controller
                     'speciality_id' => 'integer',
                 ]);
 
-                $user->update($request->only(['first_name', 'last_name', 'email']));
-                $time = date("Y-m-d H:i:s", $request->arraival_time);
-                $user->arraival_time = $time;
-                $user->save();
+                $user->update($request->only(['first_name', 'last_name', 'email', "arraival_time"]));
 
 
                 /// check if the user is a (super admin)

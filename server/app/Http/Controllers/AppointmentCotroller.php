@@ -6,7 +6,6 @@ use App\Http\Resources\AppointmentCollection;
 use App\Http\Resources\AppointmentResource;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class AppointmentCotroller extends Controller
 {
@@ -17,6 +16,11 @@ class AppointmentCotroller extends Controller
      */
     public function index()
     {
+        // return Appointment collection where speciality_id is equal to the speciality_id from the request query
+        if (request()->has("speciality_id")) {
+            return new AppointmentCollection(Appointment::where("speciality_id", request()->query("speciality_id"))->get());
+        }
+        // return Appointment collection    
         return new AppointmentCollection(Appointment::all());
     }
 
@@ -33,25 +37,24 @@ class AppointmentCotroller extends Controller
                 "name" => "required|string",
                 "description" => "required|string",
                 "date" => "required|string",
-                "doctor_id" => "required",
-                "client_id" => "required",
+                "speciality_id" => "required|integer",
+                "client_id" => "required|integer",
             ]);
-            // throw an error if the appointment is not between 12pm and 9pm
-            if ($request->date->format('H') < 12 || $request->date->format('H') > 21) {
-                throw new \Exception("Appointments can only be made between 12pm and 9pm");
+            // throw an error if the appointment date is in the past
+            if (strtotime($request->date) < strtotime(date("Y-m-d H:i:s"))) {
+                throw new \Exception("Appointment date must be in the future");
             }
-            // throe an error if the appointment doctor_id is the same as the client_id
-            if ($request->doctor_id == $request->client_id) {
-                throw new \Exception("You can't make an appointment with yourself");
+            // throw an error if the appointment date is not between 12pm and 9pm at any day
+            if (date("H", strtotime($request->date)) < 12 || date("H", strtotime($request->date)) > 21) {
+                throw new \Exception("Appointment date must be between 12pm and 9pm");
             }
-
             // create the appointment
 
             $appointment = new Appointment([
                 "name" => $request->name,
                 "description" => $request->description,
                 "date" => $request->date,
-                "doctor_id" => $request->doctor_id,
+                "speciality_id" => $request->speciality_id,
                 "client_id" => $request->client_id,
             ]);
             $appointment->save();
@@ -72,8 +75,7 @@ class AppointmentCotroller extends Controller
     public function show(Appointment $appointment, Request $request)
     {
         // check if the user is the owner of the appointment
-        if ($request->user()->id == $appointment->user_id || $request->user()->id == $appointment->doctor_id) {
-
+        if ($request->user()->id == $appointment->client_id) {
             return new AppointmentResource($appointment);
         }
         return response()->json([
