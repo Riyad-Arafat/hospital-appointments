@@ -1,11 +1,11 @@
+import React, { useEffect } from "react";
 import { Row, Card, Col, Typography, List } from "antd";
 import { LoadingSpin } from "components/LoadingSpin";
 import useAuth from "hooks/useAuth";
 import useDispatch from "hooks/useDispatch";
 import moment from "moment";
-import AppointmentForm from "pages/Home/AppointmentForm";
-import DeleteAppointment from "pages/Home/DeleteAppointment";
-import React, { useEffect } from "react";
+import AppointmentForm from "components/ApointmentComponents/AppointmentForm";
+import DeleteAppointment from "components/ApointmentComponents/DeleteAppointment";
 import { AppointmenType, GetAppointmentsResponse } from "types/Appoinment.type";
 import { ActionTypes } from "types/Atcions.typs";
 

@@ -2,8 +2,9 @@ import { useEffect } from "react";
 import useDispatch from "hooks/useDispatch";
 import { ActionTypes } from "types/Atcions.typs";
 import { GetAllSpecialitiesResponse } from "types/Speciality.types";
-import SpecialitiesList from "./SpecialitiesList";
-import SpecialityForm from "./SpecialityForm";
+import SpecialitiesList from "components/SpecialitiesComponents/SpecialitiesList";
+import SpecialityForm from "components/SpecialitiesComponents/SpecialityForm";
+import { Space } from "antd";
 
 const SpecialitiesPage = () => {
   const { dispatch, data } = useDispatch<GetAllSpecialitiesResponse>();
@@ -19,11 +20,20 @@ const SpecialitiesPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
-    <div>
-      <SpecialityForm reFetch={getAppointments} />
+    <>
+      <Space
+        style={{
+          width: "100%",
+          padding: "10px",
+          justifyContent: "center",
+        }}
+        size="large"
+      >
+        <SpecialityForm reFetch={getAppointments} />
+      </Space>
       <br />
       <SpecialitiesList data={data} reFetch={getAppointments} />
-    </div>
+    </>
   );
 };
 

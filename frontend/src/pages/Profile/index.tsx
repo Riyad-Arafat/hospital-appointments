@@ -1,16 +1,11 @@
-// Hooks
 import { useEffect, useState } from "react";
 
-/// Types & Utils
-
-/// Components
 import { Row, Col, Typography, Card } from "antd";
-
 import useAuth from "hooks/useAuth";
 import { UserType } from "types/User.type";
-import UserProfile from "./UserProfile";
-import UpdateProfileForm from "./UpdateProfileForm";
-import UserAppointments from "./UserAppointments";
+import UserProfile from "components/ProfileComponents/UserProfile";
+import UpdateProfileForm from "components/ProfileComponents/UpdateProfileForm";
+import UserAppointments from "components/ProfileComponents/UserAppointments";
 
 export const ProfilePage: React.FC = () => {
   const [profile, setProfile] = useState<UserType | null>();
